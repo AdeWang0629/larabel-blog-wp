@@ -1,0 +1,13 @@
+.header-container{
+    background-position: top center;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    height: 700px;
+    background-image: url("/assets/img/abandoned-gee6d876fd_1280.jpg");
+    background-attachment: fixed;
+}
+
+.navbar-container{
+    background-color: white;
+    height: 80px;
+}
