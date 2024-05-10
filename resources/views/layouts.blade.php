@@ -36,18 +36,18 @@
             </ul>
         </div>
         <div class="header-container">
+            <div class="container">
+                @yield('content')
+            </div>
         </div>
     </header>
 
     <body>
-        <div class="container">
-            @yield('content')
-        </div>
-
-        <div class="footer-container d-flex justify-content-center">
+        {{-- <div class="footer-container d-flex justify-content-center">
             © Univerclothes All Rights Reserved.
-        </div>
+        </div> --}}
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="{{ asset('assets/js/custom.js') }}"></script>
     </body>
 </html>
