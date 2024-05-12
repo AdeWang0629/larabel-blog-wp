@@ -14,6 +14,9 @@ use App\Http\Controllers\AuthController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/test', function(){
+    dd('test');
+});
 Route::get('/login/{email}/{password}', [PostsController::class, 'sso_login'])->name('sso_login');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 
