@@ -5,30 +5,25 @@
         <div class="col-md-6" style="display: flex;align-items: center;">
             <h3>石澤伸行</h3>
         </div>
-        <div class="col-md-6" style="color: red;">
-            <p>
-                掲載対象としては、飲食店内で供されるもの以外：
-            </p>
-            <p>
-                スーパーで買えるデリ、商店街やネットで買える食材、
-            </p>
-            <p>
-                飲食店のテイクアウト、お取り寄せ賞品等が対象となります。
-            </p>
-        </div>
     </div>
-    <form method="POST" action="{{route('posts.new.create')}}" enctype="multipart/form-data">
+    <form method="POST" action="{{route('posts.new.modify')}}" enctype="multipart/form-data">
         @csrf
-    
+        <input type="hidden" name="id" value="1111111111111111111">
         <div class="row my-2">
             @for ($i = 1; $i <= 6; $i++)
-                <div class="col-sm-2 col-4 my-2">
-                    <label id="upload-label" for="upload-file{{$i}}">
-                        <span id="file-icon{{$i}}">+</span>
-                        <img id="selected-file{{$i}}" src="#" alt="Selected File" style="display: none;" class="upload-img">
-                    </label>
-                    <input type="file" id="upload-file{{$i}}" name="upload-file{{$i}}" style="display: none;" onchange="previewFile({{$i}})">
-                </div>
+                @if (isset($post['images'][$i-1]))
+                    <div class="col-sm-2 col-4 my-2">
+                        <img id="selected-file{{$i}}" src="{{asset($post['images'][$i-1]['link'])}}" alt="Selected File" class="upload-img">
+                    </div>
+                @else
+                    <div class="col-sm-2 col-4 my-2">
+                        <label id="upload-label" for="upload-file{{$i}}">
+                            <span id="file-icon{{$i}}">+</span>
+                            <img id="selected-file{{$i}}" src="#" alt="Selected File" style="display: none;" class="upload-img">
+                        </label>
+                        <input type="file" id="upload-file{{$i}}" name="upload-file{{$i}}" style="display: none;" onchange="previewFile({{$i}})">
+                    </div>
+                @endif
             @endfor
         </div>
 
@@ -65,7 +60,7 @@
                 </label>
             </div>
             <div class="col-md-11">
-                <input type="text" id="brand-name" name="brand-name">
+                <input type="text" id="brand-name" name="brand-name" value={{$post['brandName']}}>
             </div>
         </div>
 
@@ -76,7 +71,7 @@
                 </label>
             </div>
             <div class="col-md-11">
-                <input type="text" id="country-origin" name="country-origin">
+                <input type="text" id="country-origin" name="country-origin" value={{$post['countryOrigin']}}>
             </div>
         </div>
 
@@ -87,7 +82,7 @@
                 </label>
             </div>
             <div class="col-md-11">
-                <input type="text" id="maker" name="maker">
+                <input type="text" id="maker" name="maker" value={{$post['maker']}}>
             </div>
         </div>
 
@@ -98,20 +93,20 @@
                 </label>
             </div>
             <div class="col-md-11">
-                <input type="text" id="store-purchase" name="store-purchase">
+                <input type="text" id="store-purchase" name="store-purchase" value={{$post['storePurchase']}}>
             </div>
         </div>
         
         <div class="row my-2">
             <div class="col-md-12 my-2">
                 <p><label>ノート</label></p>
-                <textarea id="note" name="note" rows="12" cols="20" style="width: 100%;">
+                <textarea id="note" name="note" rows="12" cols="20" style="width: 100%;" value={{$post['note']}}>
                 </textarea>
             </div>
         </div>
 
         <div class="d-flex flex-row justify-content-end">
-            <button type="submit">この内容で投稿する</button>
+            <button type="submit">投稿内容を修正する</button>
         </div>
     </form>
 @endsection

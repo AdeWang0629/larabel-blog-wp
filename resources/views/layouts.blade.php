@@ -17,21 +17,23 @@
     </head>
     
     <header>
-        <div class="header-container">
+        <div class="header-container d-flex">
+            <img src="{{ asset('assets/img/brand.png') }}" style="margin: auto;"/>
         </div>
+
         <div class="navbar-container d-flex justify-content-center">
             <ul class="nav nav-pills align-self-center">
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('posts.index')  ? 'active' : ''}}" href="{{ route('posts.index') }}">これまでの投稿</a>
+                    <a class="nav-link {{ request()->routeIs('posts.index')  ? 'active' : ''}}" href="{{ route('posts.index') }}" style="margin: 15px">これまでの投稿</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('posts.create')  ? 'active' : ''}}" href="{{ route('posts.create') }}">新たに投稿する</a>
+                    <a class="nav-link {{ request()->routeIs('posts.create')  ? 'active' : ''}}" href="{{ route('posts.create') }}" style="margin: 15px">新たに投稿する</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">検索</a>
+                    <a class="nav-link" href="{{ route('posts.search') }}" style="margin: 15px">検索</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">ブログ</a>
+                    <a class="nav-link" href="#" style="margin: 15px">ブログ</a>
                 </li>
             </ul>
         </div>

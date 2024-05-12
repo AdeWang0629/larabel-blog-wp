@@ -1,24 +1,6 @@
 @extends('layouts')
 
 @section('content')
-    <div class="row">
-        <div class="col-md-6" style="display: flex;align-items: center;">
-            <h3>石澤伸行</h3>
-        </div>
-        <div class="col-md-6" style="color: red;">
-            <p>
-                掲載対象としては、飲食店内で供されるもの以外：
-            </p>
-            <p>
-                スーパーで買えるデリ、商店街やネットで買える食材、
-            </p>
-            <p>
-                飲食店のテイクアウト、お取り寄せ賞品等が対象となります。
-            </p>
-        </div>
-    </div>
-    <form method="POST" action="{{route('posts.new.create')}}" enctype="multipart/form-data">
-        @csrf
     
         <div class="row my-2">
             @for ($i = 1; $i <= 6; $i++)
@@ -111,7 +93,6 @@
         </div>
 
         <div class="d-flex flex-row justify-content-end">
-            <button type="submit">この内容で投稿する</button>
+            <button type="submit">投稿内容を検索する</button>
         </div>
-    </form>
 @endsection
