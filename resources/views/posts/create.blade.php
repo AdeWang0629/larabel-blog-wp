@@ -3,7 +3,7 @@
 @section('content')
     <div class="row">
         <div class="col-md-6" style="display: flex;align-items: center;">
-            <h3>石澤伸行</h3>
+            <h4>{{$user_login}}</h4>
         </div>
         <div class="col-md-6" style="color: red;">
             <p>

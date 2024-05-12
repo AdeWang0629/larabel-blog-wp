@@ -3,12 +3,13 @@
 @section('content')
     <div class="row">
         <div class="col-md-6" style="display: flex;align-items: center;">
-            <h3>石澤伸行</h3>
+            <h3>{{$user_login}}</h3>
         </div>
     </div>
     <form method="POST" action="{{route('posts.new.modify')}}" enctype="multipart/form-data">
         @csrf
-        <input type="hidden" name="id" value="1111111111111111111">
+        <input type="hidden" name="id" value={{$post['id']}}>
+        
         <div class="row my-2">
             @for ($i = 1; $i <= 6; $i++)
                 @if (isset($post['images'][$i-1]))
@@ -60,7 +61,7 @@
                 </label>
             </div>
             <div class="col-md-11">
-                <input type="text" id="brand-name" name="brand-name" value={{$post['brandName']}}>
+                <input type="text" id="brand-name" name="brand-name" value={{$post['brandName']}} @if(!$modify_status) disabled @endif>
             </div>
         </div>
 
@@ -71,7 +72,7 @@
                 </label>
             </div>
             <div class="col-md-11">
-                <input type="text" id="country-origin" name="country-origin" value={{$post['countryOrigin']}}>
+                <input type="text" id="country-origin" name="country-origin" value={{$post['countryOrigin']}} @if(!$modify_status) disabled @endif>
             </div>
         </div>
 
@@ -82,7 +83,7 @@
                 </label>
             </div>
             <div class="col-md-11">
-                <input type="text" id="maker" name="maker" value={{$post['maker']}}>
+                <input type="text" id="maker" name="maker" value={{$post['maker']}} @if(!$modify_status) disabled @endif>
             </div>
         </div>
 
@@ -93,20 +94,21 @@
                 </label>
             </div>
             <div class="col-md-11">
-                <input type="text" id="store-purchase" name="store-purchase" value={{$post['storePurchase']}}>
+                <input type="text" id="store-purchase" name="store-purchase" value={{$post['storePurchase']}} @if(!$modify_status) disabled @endif>
             </div>
         </div>
         
         <div class="row my-2">
             <div class="col-md-12 my-2">
                 <p><label>ノート</label></p>
-                <textarea id="note" name="note" rows="12" cols="20" style="width: 100%;" value={{$post['note']}}>
+                <textarea id="note" name="note" rows="12" cols="20" style="width: 100%;" @if(!$modify_status) disabled @endif>
+                    {{$post['note']}}
                 </textarea>
             </div>
         </div>
 
         <div class="d-flex flex-row justify-content-end">
-            <button type="submit">投稿内容を修正する</button>
+            <button type="submit" @if(!$modify_status) disabled @endif>投稿内容を修正する</button>
         </div>
     </form>
 @endsection

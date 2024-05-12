@@ -1,19 +1,8 @@
 @extends('layouts')
 
 @section('content')
-    
-        <div class="row my-2">
-            @for ($i = 1; $i <= 6; $i++)
-                <div class="col-sm-2 col-4 my-2">
-                    <label id="upload-label" for="upload-file{{$i}}">
-                        <span id="file-icon{{$i}}">+</span>
-                        <img id="selected-file{{$i}}" src="#" alt="Selected File" style="display: none;" class="upload-img">
-                    </label>
-                    <input type="file" id="upload-file{{$i}}" name="upload-file{{$i}}" style="display: none;" onchange="previewFile({{$i}})">
-                </div>
-            @endfor
-        </div>
-
+    <form method="POST" action="{{route('posts.search.result')}}">
+        @csrf
         <div class="row my-2">
             <div class="col-md-6 my-2">
                 <label>
@@ -47,7 +36,7 @@
                 </label>
             </div>
             <div class="col-md-11">
-                <input type="text" id="brand-name" name="brand-name">
+                <input type="text" id="brand-name" name="brand-name" value={{$brandName}}>
             </div>
         </div>
 
@@ -58,7 +47,7 @@
                 </label>
             </div>
             <div class="col-md-11">
-                <input type="text" id="country-origin" name="country-origin">
+                <input type="text" id="country-origin" name="country-origin" value={{$countryOrigin}}>
             </div>
         </div>
 
@@ -69,7 +58,7 @@
                 </label>
             </div>
             <div class="col-md-11">
-                <input type="text" id="maker" name="maker">
+                <input type="text" id="maker" name="maker" value={{$maker}}>
             </div>
         </div>
 
@@ -80,7 +69,7 @@
                 </label>
             </div>
             <div class="col-md-11">
-                <input type="text" id="store-purchase" name="store-purchase">
+                <input type="text" id="store-purchase" name="store-purchase" value={{$storePurchase}}>
             </div>
         </div>
         
@@ -88,6 +77,7 @@
             <div class="col-md-12 my-2">
                 <p><label>ノート</label></p>
                 <textarea id="note" name="note" rows="12" cols="20" style="width: 100%;">
+                    {{$note}}
                 </textarea>
             </div>
         </div>
@@ -95,4 +85,16 @@
         <div class="d-flex flex-row justify-content-end">
             <button type="submit">投稿内容を検索する</button>
         </div>
+    </form>
+
+    @if (count($search_data))
+        @foreach ($search_data as $post)
+            <div class="col-md-4">
+                <a href="{{ url('/modify-posts/' . $post->id) }}">
+                    <img src="{{ asset($post->images[0]->link) }}" alt="{{ $post->title }}" style="width: 100%;height: 50vh;"/>
+                </a>
+                <p class="my-2">投稿者: {{$post->userEmail}}</p>
+            </div>
+        @endforeach
+    @endif
 @endsection

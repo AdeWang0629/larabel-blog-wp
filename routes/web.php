@@ -26,3 +26,4 @@ Route::post('/new-modify', [PostsController::class, 'new_modify'])->name('posts.
 Route::get('/posts/create', [PostsController::class, 'create'])->name('posts.create');
 Route::post('/posts/create', [PostsController::class, 'new_create'])->name('posts.new.create');
 Route::get('/posts/search', [PostsController::class, 'search'])->name('posts.search');
+Route::post('/posts/search/result', [PostsController::class, 'search_result'])->name('posts.search.result');
