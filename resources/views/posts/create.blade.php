@@ -3,7 +3,7 @@
 @section('content')
     <div class="row">
         <div class="col-md-6" style="display: flex;align-items: center;">
-            <h4>{{$user_login}}</h4>
+            <a href="https://univer-goods.com/member/univergoods/profile/edit/group/1/"><h4>{{$user_login}}</h4></a>
         </div>
         <div class="col-md-6" style="color: red;">
             <p>

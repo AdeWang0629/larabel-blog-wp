@@ -20,6 +20,7 @@ Route::get('/test', function(){
 Route::get('/login/{email}/{password}', [PostsController::class, 'sso_login'])->name('sso_login');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 
+Route::get('/', [PostsController::class, 'index'])->name('posts.index');
 Route::get('/posts', [PostsController::class, 'index'])->name('posts.index');
 Route::get('/modify-posts/{postid}', [PostsController::class, 'index_modify'])->name('posts.index.modify');
 Route::post('/new-modify', [PostsController::class, 'new_modify'])->name('posts.new.modify');

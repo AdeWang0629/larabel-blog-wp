@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\WpUsers;
+use App\Models\Posts;
 use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
@@ -18,7 +19,8 @@ class AuthController extends Controller
             Session::put('user_email', $request->input('email'));
             return redirect()->route('posts.index');
         }else {
-            dd('---------------------------------------');
+            $posts = Posts::orderBy('updated_at', 'desc')->with('images')->get();
+            return view('posts.index', compact('posts'));
         }
     }
 }

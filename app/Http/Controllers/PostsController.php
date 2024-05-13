@@ -11,12 +11,8 @@ use App\Models\WpUsers;
 class PostsController extends Controller
 {
     public function index(){
-        if (Session::has('user_email')) {
-            $posts = Posts::orderBy('updated_at', 'desc')->with('images')->get();
-            return view('posts.index', compact('posts'));
-        }else {
-            dd('---------------------------------------');
-        }
+        $posts = Posts::orderBy('updated_at', 'desc')->with('images')->get();
+        return view('posts.index', compact('posts'));
     }
 
     public function index_modify(Request $request){
@@ -28,7 +24,8 @@ class PostsController extends Controller
             $modify_status = ($post['userEmail'] == Session::get('user_email'));
             return view('posts.index_modify', compact('post', 'user_login', 'modify_status'));
         }else {
-            dd('---------------------------------------');
+            $posts = Posts::orderBy('updated_at', 'desc')->with('images')->get();
+            return view('posts.index', compact('posts'));
         }
     }
 
@@ -107,7 +104,8 @@ class PostsController extends Controller
             
             return redirect()->route('posts.index');
         }else {
-            dd('---------------------------------------');
+            $posts = Posts::orderBy('updated_at', 'desc')->with('images')->get();
+            return view('posts.index', compact('posts'));
         }
     }
 
@@ -117,7 +115,8 @@ class PostsController extends Controller
             $user_login = $result[0]['user_login'];
             return view('posts.create', compact('user_login'));
         }else {
-            dd('---------------------------------------');
+            $posts = Posts::orderBy('updated_at', 'desc')->with('images')->get();
+            return view('posts.index', compact('posts'));
         }
     }
 
@@ -202,69 +201,62 @@ class PostsController extends Controller
             
             return redirect()->route('posts.create');
         }else {
-            dd('---------------------------------------');
+            $posts = Posts::orderBy('updated_at', 'desc')->with('images')->get();
+            return view('posts.index', compact('posts'));
         }
     }
 
     public function search(){
-        if (Session::has('user_email')) {
-            $search_data = [];
-            $brandName = '';
-            $countryOrigin = '';
-            $maker = '';
-            $storePurchase = '';
-            $note = '';
-            return view('posts.search', compact('search_data', 'brandName', 'countryOrigin', 'maker', 'storePurchase', 'note'));
-        }else {
-            dd('---------------------------------------');
-        }
+        $search_data = [];
+        $brandName = '';
+        $countryOrigin = '';
+        $maker = '';
+        $storePurchase = '';
+        $note = '';
+        return view('posts.search', compact('search_data', 'brandName', 'countryOrigin', 'maker', 'storePurchase', 'note'));
     }
 
     public function search_result(Request $request){
-        if (Session::has('user_email')) {
-            $brandName = $request->input('brand-name');
-            $countryOrigin = $request->input('country-origin');
-            $maker = $request->input('maker');
-            $storePurchase = $request->input('store-purchase');
-            $note = $request->input('note');
+        $brandName = $request->input('brand-name');
+        $countryOrigin = $request->input('country-origin');
+        $maker = $request->input('maker');
+        $storePurchase = $request->input('store-purchase');
+        $note = $request->input('note');
 
-             // Build the query to fetch the matching posts
-            $posts = Posts::query();
+        // Build the query to fetch the matching posts
+        $posts = Posts::query();
 
-            // if ($categoryFirst) {
-            //     $posts->where('category_first', $categoryFirst);
-            // }
+        // if ($categoryFirst) {
+        //     $posts->where('category_first', $categoryFirst);
+        // }
 
-            // if ($categorySecond) {
-            //     $posts->where('category_second', $categorySecond);
-            // }
+        // if ($categorySecond) {
+        //     $posts->where('category_second', $categorySecond);
+        // }
 
-            if ($brandName) {
-                $posts->where('brandName', 'like', '%' . $brandName . '%');
-            }
-
-            if ($countryOrigin) {
-                $posts->where('countryOrigin', 'like', '%' . $countryOrigin . '%');
-            }
-
-            if ($maker) {
-                $posts->where('maker', 'like', '%' . $maker . '%');
-            }
-
-            if ($storePurchase) {
-                $posts->where('storePurchase', 'like', '%' . $storePurchase . '%');
-            }
-
-            if ($note) {
-                $posts->where('note', 'like', '%' . $note . '%');
-            }
-
-            $search_data = $posts->get();
-
-            // Pass the search results to the view
-            return view('posts.search', compact('search_data', 'brandName', 'countryOrigin', 'maker', 'storePurchase', 'note'));
-        }else {
-            dd('---------------------------------------');
+        if ($brandName) {
+            $posts->where('brandName', 'like', '%' . $brandName . '%');
         }
+
+        if ($countryOrigin) {
+            $posts->where('countryOrigin', 'like', '%' . $countryOrigin . '%');
+        }
+
+        if ($maker) {
+            $posts->where('maker', 'like', '%' . $maker . '%');
+        }
+
+        if ($storePurchase) {
+            $posts->where('storePurchase', 'like', '%' . $storePurchase . '%');
+        }
+
+        if ($note) {
+            $posts->where('note', 'like', '%' . $note . '%');
+        }
+
+        $search_data = $posts->get();
+
+        // Pass the search results to the view
+        return view('posts.search', compact('search_data', 'brandName', 'countryOrigin', 'maker', 'storePurchase', 'note'));
     }
 }

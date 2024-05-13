@@ -96,5 +96,9 @@
                 <p class="my-2">投稿者: {{$post->userEmail}}</p>
             </div>
         @endforeach
+    @else
+        <div class="no-container">
+            <span>検索内容がありません。</span>
+        </div>
     @endif
 @endsection
