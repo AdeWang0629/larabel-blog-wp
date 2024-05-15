@@ -24,19 +24,19 @@
         <div class="navbar-container d-flex justify-content-center">
             <ul class="nav nav-pills align-self-center">
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('posts.index')  ? 'active' : ''}}" href="{{ route('posts.index') }}" style="margin: 15px">これまでの投稿</a>
+                    <a class="nav-link {{ request()->routeIs('posts.index')  ? 'active' : ''}}" href="{{ route('posts.index') }}" style="margin: 15px 30px;">これまでの投稿</a>
                 </li>
                @if (session()->has('user_email'))
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('posts.create')  ? 'active' : ''}}" href="{{ route('posts.create') }}" style="margin: 15px">新たに投稿する</a>
+                        <a class="nav-link {{ request()->routeIs('posts.create')  ? 'active' : ''}}" href="{{ route('posts.create') }}" style="margin: 15px 30px;">新たに投稿する</a>
                     </li>
                @endif
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('posts.search') }}" style="margin: 15px">検索</a>
+                    <a class="nav-link" href="{{ route('posts.search') }}" style="margin: 15px 30px;">検索</a>
                 </li>
                 @if (session()->has('user_email'))
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('posts.create')  ? 'active' : ''}}" href="#" style="margin: 15px">ブログ</a>
+                        <a class="nav-link {{ request()->routeIs('posts.blog')  ? 'active' : ''}}" href="#" style="margin: 15px 30px;">ブログ</a>
                     </li>
                 @endif
             </ul>

@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Session;
 use App\Models\Posts;
 use App\Models\PostImages;
 use App\Models\WpUsers;
+use App\Models\WpBpActivity;
+use Illuminate\Support\Facades\Validator;
 
 class PostsController extends Controller
 {
@@ -31,13 +33,14 @@ class PostsController extends Controller
 
     public function new_modify(Request $request){
         if (Session::has('user_email')) {
+            $result = WpUsers::where('user_email', Session::get('user_email'))->get();
             $posts = Posts::find($request->input('id'));
             $posts->brandName = $request->input('brand-name');
             $posts->countryOrigin = $request->input('country-origin');
             $posts->maker = $request->input('maker');
             $posts->storePurchase = $request->input('store-purchase');
             $posts->note = $request->input('note');
-            $posts->userEmail = Session::get('user_email');
+            $posts->userNicename =  $result[0]['user_nicename'];
             $posts->save();
 
             // if ($request->hasFile('upload-file1')) {
@@ -112,8 +115,10 @@ class PostsController extends Controller
     public function create(){
         if (Session::has('user_email')) {
             $result = WpUsers::where('user_email', Session::get('user_email'))->get();
-            $user_login = $result[0]['user_login'];
-            return view('posts.create', compact('user_login'));
+            $userdata = $result[0];
+            $other_result = WpBpActivity::where('user_id', $result[0]['id'])->orderBy('date_recorded', 'desc')->first();
+            $timestamp = strtotime($other_result['date_recorded']);
+            return view('posts.create', compact('userdata', 'timestamp'));
         }else {
             $posts = Posts::orderBy('updated_at', 'desc')->with('images')->get();
             return view('posts.index', compact('posts'));
@@ -128,13 +133,36 @@ class PostsController extends Controller
 
     public function new_create(Request $request){
         if (Session::has('user_email')) {
+            $validator = Validator::make($request->all(), [
+                'upload-file1' => 'image|max:2048',
+                'upload-file2' => 'image|max:2048',
+                'upload-file3' => 'image|max:2048',
+                'upload-file4' => 'image|max:2048',
+                'upload-file5' => 'image|max:2048',
+                'upload-file6' => 'image|max:2048',
+                'category-first' => 'required',
+                'category-second' => 'required',
+                'brand-name' => 'required|max:255',
+                'country-origin' => 'required|max:255',
+                'maker' => 'required|max:255',
+                'store-purchase' => 'required|max:255',
+                'note' => 'required',
+            ],[
+                'required' => 'この項目入力は必須です。',
+            ]);
+            
+            if ($validator->fails()) {
+                return redirect()->back()->withErrors($validator)->withInput();
+            }
+            
+            $result = WpUsers::where('user_email', Session::get('user_email'))->get();
             $posts = new Posts;
             $posts->brandName = $request->input('brand-name');
             $posts->countryOrigin = $request->input('country-origin');
             $posts->maker = $request->input('maker');
             $posts->storePurchase = $request->input('store-purchase');
             $posts->note = $request->input('note');
-            $posts->userEmail = Session::get('user_email');
+            $posts->userNicename =  $result[0]['user_nicename'];
             $posts->save();
 
             if ($request->hasFile('upload-file1')) {

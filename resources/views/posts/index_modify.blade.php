@@ -101,9 +101,7 @@
         <div class="row my-2">
             <div class="col-md-12 my-2">
                 <p><label>ノート</label></p>
-                <textarea id="note" name="note" rows="12" cols="20" style="width: 100%;" @if(!$modify_status) disabled @endif>
-                    {{$post['note']}}
-                </textarea>
+                <textarea id="note" name="note" rows="24" cols="20" style="width: 100%;" @if(!$modify_status) disabled @endif>{{$post['note']}}</textarea>
             </div>
         </div>
 

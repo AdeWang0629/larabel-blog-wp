@@ -30,45 +30,45 @@
         </div>
 
         <div class="row my-2">
-            <div class="col-md-1">
+            <div class="col-md-2">
                 <label>
                     商品名
                 </label>
             </div>
-            <div class="col-md-11">
+            <div class="col-md-10">
                 <input type="text" id="brand-name" name="brand-name" value={{$brandName}}>
             </div>
         </div>
 
         <div class="row my-2">
-            <div class="col-md-1">
+            <div class="col-md-2">
                 <label>
                     生産国
                 </label>
             </div>
-            <div class="col-md-11">
+            <div class="col-md-10">
                 <input type="text" id="country-origin" name="country-origin" value={{$countryOrigin}}>
             </div>
         </div>
 
         <div class="row my-2">
-            <div class="col-md-1">
+            <div class="col-md-2">
                 <label>
                     メーカー
                 </label>
             </div>
-            <div class="col-md-11">
+            <div class="col-md-10">
                 <input type="text" id="maker" name="maker" value={{$maker}}>
             </div>
         </div>
 
         <div class="row my-2">
-            <div class="col-md-1">
+            <div class="col-md-2">
                 <label>
                     購入店舗
                 </label>
             </div>
-            <div class="col-md-11">
+            <div class="col-md-10">
                 <input type="text" id="store-purchase" name="store-purchase" value={{$storePurchase}}>
             </div>
         </div>
@@ -87,15 +87,24 @@
         </div>
     </form>
 
+    <div style="text-align: center">
+        <h1>検索結果</h1>
+    </div>
     @if (count($search_data))
-        @foreach ($search_data as $post)
-            <div class="col-md-4">
-                <a href="{{ url('/modify-posts/' . $post->id) }}">
-                    <img src="{{ asset($post->images[0]->link) }}" alt="{{ $post->title }}" style="width: 100%;height: 50vh;"/>
-                </a>
-                <p class="my-2">投稿者: {{$post->userEmail}}</p>
-            </div>
-        @endforeach
+        <div class="row">
+            @foreach ($search_data as $post)
+                <div class="col-md-4">
+                    <a href="{{ url('/modify-posts/' . $post->id) }}">
+                        @if (count($post->images))
+                            <img src="{{ asset($post->images[0]->link) }}" alt="{{ $post->title }}" style="width: 100%; height: 300px;"/>
+                        @else
+                            <img src="{{ asset('assets/img/no-image--recent-activity2.svg') }}" alt="{{ $post->title }}" style="width: 100%;height: height: 300px;"/>
+                        @endif
+                    </a>
+                    <p class="my-2">投稿者: {{$post->userEmail}}</p>
+                </div>
+            @endforeach
+        </div>
     @else
         <div class="no-container">
             <span>検索内容がありません。</span>

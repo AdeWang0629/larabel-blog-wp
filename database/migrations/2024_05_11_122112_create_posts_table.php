@@ -23,7 +23,7 @@ class CreatePostsTable extends Migration
             $table->string('maker');
             $table->string('storePurchase');
             $table->string('note');
-            $table->string('userEmail');
+            $table->string('userNicename');
         });
     }
 
