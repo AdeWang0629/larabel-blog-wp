@@ -4,10 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+
 use App\Models\Posts;
 use App\Models\PostImages;
 use App\Models\WpUsers;
 use App\Models\WpBpActivity;
+use App\Models\PostsLike;
+use App\Models\PostsComment;
+
 use Illuminate\Support\Facades\Validator;
 
 class PostsController extends Controller
@@ -19,12 +23,17 @@ class PostsController extends Controller
 
     public function index_modify(Request $request){
         if (Session::has('user_email')) {   
-            $result = Posts::find($request['postid'])->with('images')->get();
+            $result = Posts::where('id', $request['postid'])->with('images')->with('comments')->get();
             $post = $result[0];
-            $result = WpUsers::where('user_email', Session::get('user_email'))->get();
-            $user_login = $result[0]['user_login'];
-            $modify_status = ($post['userEmail'] == Session::get('user_email'));
-            return view('posts.index_modify', compact('post', 'user_login', 'modify_status'));
+
+            $second_result = WpUsers::where('user_email', Session::get('user_email'))->get();
+            $user_login = $second_result[0]['user_login'];
+
+            $modify_status = ($post['userNicename'] == $second_result[0]['user_nicename']);
+            
+            $like_result = PostsLike::where('user_email', Session::get('user_email'))->where('post_id', $post['id'])->get();
+
+            return view('posts.index_modify', compact('post', 'user_login', 'modify_status', 'like_result'));
         }else {
             $posts = Posts::orderBy('updated_at', 'desc')->with('images')->get();
             return view('posts.index', compact('posts'));
@@ -116,7 +125,7 @@ class PostsController extends Controller
         if (Session::has('user_email')) {
             $result = WpUsers::where('user_email', Session::get('user_email'))->get();
             $userdata = $result[0];
-            $other_result = WpBpActivity::where('user_id', $result[0]['id'])->orderBy('date_recorded', 'desc')->first();
+            $other_result = WpBpActivity::where('user_id', $result[0]['ID'])->orderBy('date_recorded', 'desc')->first();
             $timestamp = strtotime($other_result['date_recorded']);
             return view('posts.create', compact('userdata', 'timestamp'));
         }else {
@@ -127,8 +136,8 @@ class PostsController extends Controller
 
     public function sso_login(Request $request){
         $email = $request['email'];
-        $password = $request['password'];
-        return view('welcome', compact('email', 'password'));
+        // $password = $request['password'];
+        return view('welcome', compact('email'));
     }
 
     public function new_create(Request $request){
@@ -287,4 +296,45 @@ class PostsController extends Controller
         // Pass the search results to the view
         return view('posts.search', compact('search_data', 'brandName', 'countryOrigin', 'maker', 'storePurchase', 'note'));
     }
+
+    public function destroy($id){
+        $post = Posts::find($id);
+        $post->delete();
+        $posts = Posts::orderBy('updated_at', 'desc')->with('images')->get();
+        return view('posts.index', compact('posts'));
+    }
+
+    public function like($id){
+        if (Session::has('user_email')) {
+            $posts_like = new PostsLike;
+            $posts_like->user_email = Session::get('user_email');
+            $posts_like->post_id = $id;
+            $posts_like->save();
+
+            $posts = Posts::orderBy('updated_at', 'desc')->with('images')->get();
+            return view('posts.index', compact('posts'));
+        }else {
+            $posts = Posts::orderBy('updated_at', 'desc')->with('images')->get();
+            return view('posts.index', compact('posts'));
+        }
+    }
+
+    public function comment(Request $request){
+        $posts_comment = new PostsComment;
+        $posts_comment->post_id = $request->input('comment_post_id');
+        $posts_comment->comment = $request->input('comment_note');
+        $posts_comment->save();
+  
+        $result = Posts::where('id', $request['comment_post_id'])->with('images')->with('comments')->get();
+        $post = $result[0];
+       
+        $second_result = WpUsers::where('user_email', Session::get('user_email'))->get();
+        $user_login = $second_result[0]['user_login'];
+
+        $modify_status = ($post['userNicename'] == $second_result[0]['user_nicename']);
+        
+        $like_result = PostsLike::where('user_email', Session::get('user_email'))->where('post_id', $post['id'])->get();
+
+        return view('posts.index_modify', compact('post', 'user_login', 'modify_status', 'like_result'));
+    }   
 }

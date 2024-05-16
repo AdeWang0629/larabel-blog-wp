@@ -11,7 +11,7 @@
                         <img src="{{ asset('assets/img/no-image--recent-activity2.svg') }}" alt="{{ $post->title }}" style="width: 100%;height: 300px;"/>
                     @endif
                 </a>
-                <p class="my-2">投稿者: {{$post->userEmail}}</p>
+                <p class="my-2">投稿者: {{$post->userNicename}}</p>
             </div>
         @endforeach
     </div>

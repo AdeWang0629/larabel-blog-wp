@@ -109,4 +109,68 @@
             <button type="submit" @if(!$modify_status) disabled @endif>投稿内容を修正する</button>
         </div>
     </form>
+
+    @if (count($post['comments']))
+        @foreach ($post['comments'] as $comment)
+            <div>
+                <p>{{ $comment->comment }}</p>
+            </div>
+        @endforeach
+    @endif
+
+    <div class="d-flex justify-content-center">
+        <div class="btn-group">
+
+            <button type="button" class="btn btn-primary" id="comment-button">コメント</button>
+
+            <form method="POST" action="{{ route('posts.new.like', $post['id']) }}">
+                @csrf
+                <button type="submit" class="btn btn-success" @if(!count($like_result)) disabled @endif>いいね！</button>
+            </form>
+
+            <form method="POST" action="{{ route('posts.new.delete', $post['id']) }}">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger">消滅</button>
+            </form>
+
+        </div>
+    </div>
+
+    
+    <div id="comment-form" style="display: none; margin-top: 10px;">
+        <form method="POST" action="{{ route('posts.new.comment') }}">
+            @csrf
+            <input type="text" id="comment_post_id" name="comment_post_id" value="{{$post['id']}}" hidden />
+            <textarea type="text" id="comment_note" name="comment_note" rows="4" cols="20" style="width: 100%;" placeholder="コメントを入力してください"></textarea>
+            <button type="submit" id="comment-post" class="btn btn-success">投稿</button>
+            <button type="button" id="comment-cancel" class="btn btn-danger">キャンセル</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('comment-button').addEventListener('click', function() {
+            document.getElementById('comment-form').style.display = 'block';
+        });
+
+        document.getElementById('comment-cancel').addEventListener('click', function() {
+            document.getElementById('comment-form').style.display = 'none';
+        });
+
+        document.getElementById('comment-post').addEventListener('click', function() {
+            var commentInput = document.getElementById('comment-input');
+            var comment = commentInput.value.trim();
+            
+            if (comment !== '') {
+                // サーバーにコメントを送信する処理を実装する
+                console.log('投稿するコメント: ' + comment);
+                
+                // コメントフォームを非表示にする
+                document.getElementById('comment-form').style.display = 'none';
+                
+                // コメント入力フィールドを空に
+                commentInput.value = '';
+            }
+        });
+    </script>
 @endsection

@@ -17,7 +17,8 @@ use App\Http\Controllers\AuthController;
 Route::get('/test', function(){
     dd('test');
 });
-Route::get('/login/{email}/{password}', [PostsController::class, 'sso_login'])->name('sso_login');
+// Route::get('/login/{email}/{password}', [PostsController::class, 'sso_login'])->name('sso_login');
+Route::get('/login/{email}', [PostsController::class, 'sso_login'])->name('sso_login');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 Route::get('/', [PostsController::class, 'index'])->name('posts.index');
@@ -28,3 +29,8 @@ Route::get('/posts/create', [PostsController::class, 'create'])->name('posts.cre
 Route::post('/posts/create', [PostsController::class, 'new_create'])->name('posts.new.create');
 Route::get('/posts/search', [PostsController::class, 'search'])->name('posts.search');
 Route::post('/posts/search/result', [PostsController::class, 'search_result'])->name('posts.search.result');
+
+Route::delete('/new-delete/{postid}', [PostsController::class, 'destroy'])->name('posts.new.delete');
+Route::post('/new-like/{postid}', [PostsController::class, 'like'])->name('posts.new.like');
+
+Route::post('/new-comment', [PostsController::class, 'comment'])->name('posts.new.comment');

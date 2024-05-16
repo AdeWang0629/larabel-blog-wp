@@ -22,7 +22,7 @@ class CreatePostsTable extends Migration
             $table->string('countryOrigin');
             $table->string('maker');
             $table->string('storePurchase');
-            $table->string('note');
+            $table->longText('note');
             $table->string('userNicename');
         });
     }
