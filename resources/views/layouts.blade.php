@@ -20,7 +20,7 @@
     
     <header>
         <div class="header-container d-flex">
-            <img src="{{ asset('assets/img/brand.png') }}" style="margin: auto;"/>
+            <img src="{{ asset('assets/img/brand.png') }}" style="margin: auto; width:35%;"/>
         </div>
 
         <div class="navbar-container d-flex justify-content-center">

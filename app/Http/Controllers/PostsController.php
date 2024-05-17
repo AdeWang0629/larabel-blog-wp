@@ -39,38 +39,39 @@ class PostsController extends Controller
     }
 
     public function index_modify(Request $request){
+        $result = Posts::where('id', $request['postid'])->with('images')->with('comments')->get();
+        $post = $result[0];
+
+        $second_result = WpUsers::where('user_email', Session::get('user_email'))->get();
+        $modify_status;
+        $like_result;
+        
         if (Session::has('user_email')) {   
-            $result = Posts::where('id', $request['postid'])->with('images')->with('comments')->get();
-            $post = $result[0];
-
-            $second_result = WpUsers::where('user_email', Session::get('user_email'))->get();
-
             $modify_status = ($post['userLogin'] == $second_result[0]['user_login']); 
-
             $like_result = PostsLike::where('user_email', Session::get('user_email'))->where('post_id', $post['id'])->first();
-
-            $big_categories = BigCategory::get();
-            $big_small_categories = BigSmallCategory::where('big_category', $post['categoryFirst'])->get();
-            $small_categories = SmallCategory::get();
-
-            $submissionTime = Carbon::parse($post['updated_at']);
-            $currentTime = Carbon::now();
-
-            $timeDiff = $currentTime->diffInMinutes($submissionTime);
-
-            if ($timeDiff < 60) {
-                $displayTime = $timeDiff . '分前';
-            } elseif ($timeDiff < 1440) {
-                $displayTime = $currentTime->diffInHours($submissionTime) . '時間前';
-            } else {
-                $displayTime = $currentTime->diffInDays($submissionTime) . '日前';
-            }
-
-            return view('posts.index_modify', compact('post', 'modify_status', 'like_result', 'big_categories', 'big_small_categories', 'small_categories', 'displayTime'));
         }else {
-            $posts = Posts::orderBy('updated_at', 'desc')->with('images')->get();
-            return view('posts.index', compact('posts'));
+            $modify_status = false;
+            $like_result =  [];
         }
+
+        $big_categories = BigCategory::get();
+        $big_small_categories = BigSmallCategory::where('big_category', $post['categoryFirst'])->get();
+        $small_categories = SmallCategory::get();
+
+        $submissionTime = Carbon::parse($post['updated_at']);
+        $currentTime = Carbon::now();
+
+        $timeDiff = $currentTime->diffInMinutes($submissionTime);
+
+        if ($timeDiff < 60) {
+            $displayTime = $timeDiff . '分前';
+        } elseif ($timeDiff < 1440) {
+            $displayTime = $currentTime->diffInHours($submissionTime) . '時間前';
+        } else {
+            $displayTime = $currentTime->diffInDays($submissionTime) . '日前';
+        }
+
+        return view('posts.index_modify', compact('post', 'modify_status', 'like_result', 'big_categories', 'big_small_categories', 'small_categories', 'displayTime'));
     }
 
     public function new_modify(Request $request){
@@ -479,7 +480,7 @@ class PostsController extends Controller
 
         $html = '<option value="">クリックして選択</option>';
         foreach ($subCategories as $category) {
-            $html .= '<option value="' . $smallCategories[$category->id - 1]->id . '">' . $smallCategories[$category->id - 1]->category . '</option>';
+            $html .= '<option value="' . $category->small_category . '">' . $smallCategories[$category->small_category - 1]->category . '</option>';
         }
 
         return $html;

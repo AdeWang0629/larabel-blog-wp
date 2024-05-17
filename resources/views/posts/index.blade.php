@@ -12,7 +12,7 @@
                     @endif
                 </a>
                 <p class="my-2">
-                    投稿者:  <img src="{{ 'https://univer-goods.com/wp-content/uploads/avatars/'.$post['userId'].'/'.$post['timestamp'].'-bpfull.jpg' }}" style="border-radius: 50%;width:30px;"><a href="{{ 'https://univer-goods.com/member/'.$post['userLogin'].'/profile/edit/group/1/' }}" style="align-self: flex-end;">{{$post['userLogin']}}</a><i class="fa fa-comment" style="font-size:16px;margin-left:15px;margin-right:15px;">{{count($post['comments'])}}</i>
+                    投稿者:  <img src="{{ 'https://univer-goods.com/wp-content/uploads/avatars/'.$post['userId'].'/'.$post['timestamp'].'-bpfull.jpg' }}" style="border-radius: 50%;width:30px;"><a href="{{ 'https://univer-goods.com/member/'.$post['userLogin'].'/profile/edit/group/1/' }}" style="align-self: flex-end;">{{$post['userLogin']}}</a><i class="fa fa-comment" style="font-size:16px;margin-left:15px;margin-right:15px;">{{count($post['comments'])}}</i> <i class="fa fa-star-o" style="font-size:15px;">{{count($post['likes'])}}</i>
                 </p>
             </div>
         @endforeach

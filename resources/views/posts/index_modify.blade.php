@@ -15,11 +15,11 @@
         <div class="row my-2">
             @for ($i = 1; $i <= 6; $i++)
                 @if (isset($post['images'][$i-1]))
-                    <div class="col-sm-2 col-4 my-2">
+                    <div class="col-lg-2 col-4 my-2">
                         <img id="selected-file{{$i}}" src="{{asset($post['images'][$i-1]['link'])}}" alt="Selected File" class="upload-img">
                     </div>
                 @else
-                    <div class="col-sm-2 col-4 my-2">
+                    <div class="col-lg-2 col-4 my-2">
                         <label id="upload-label" for="upload-file{{$i}}">
                             <span id="file-icon{{$i}}">+</span>
                             <img id="selected-file{{$i}}" src="#" alt="Selected File" style="display: none;" class="upload-img">
@@ -52,7 +52,7 @@
                 <select name="small-category" id="small-category" style="width: 200px;">
                     <option value="">クリックして選択</option>
                     @foreach ($big_small_categories as $category)
-                        <option value="{{ $small_categories[$category->small_category - 1]->id }}" @if ($small_categories[$category->small_category - 1]->id == $post['categoryFirst']) selected @endif>
+                        <option value="{{ $small_categories[$category->small_category - 1]->id }}" @if ($small_categories[$category->small_category - 1]->id == $post['categorySecond']) selected @endif>
                             {{ $small_categories[$category->small_category - 1]->category }}
                         </option>
                     @endforeach
@@ -117,8 +117,8 @@
     </form>
 
     <div class="btn-group">
-
-        <button type="button" class="btn btn-primary" id="comment-button">
+ 
+        <button type="button" class="btn btn-primary" id="comment-button" @if(!Session::get('user_email')) disabled @endif >
             コメント
             <i class="fa fa-comment" style="font-size:16px;"></i>
         </button>
