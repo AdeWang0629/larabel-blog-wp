@@ -16,14 +16,15 @@ class CreatePostsTable extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->integer('categoryFirst')->default(1);
-            $table->integer('categorySecond')->default(1);
+            $table->integer('categoryFirst');
+            $table->integer('categorySecond');
             $table->string('brandName');
             $table->string('countryOrigin');
             $table->string('maker');
             $table->string('storePurchase');
             $table->longText('note');
             $table->string('userLogin');
+            $table->integer('userId');
         });
     }
 

@@ -17,7 +17,7 @@ class CreatePostsLikeTable extends Migration
             $table->id();
             $table->timestamps();
             $table->string('user_email');
-            $table->integer('post_id');
+            $table->foreignId('post_id')->constrained('posts')->onDelete('cascade');
         });
     }
 

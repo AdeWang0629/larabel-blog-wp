@@ -5,6 +5,40 @@
         @csrf
 
         <div class="row my-2">
+            <div class="col-md-6 my-2">
+                <label>
+                    商品カテゴリ1
+                </label>
+
+                <select name="big-category" id="big-category" style="width: 200px;" onchange="loadSubCategories(this.value)">
+                    <option value="">クリックして選択</option>
+                    @foreach ($big_categories as $category)
+                    <option value="{{ $category->id }}" @if ($category->id == $big_category) selected @endif>
+                        {{ $category->category }}
+                    </option>
+                @endforeach
+                </select>
+            </div>
+
+            <div class="col-md-6 my-2">
+                <label>
+                    商品カテゴリ2
+                </label>
+
+                <select name="small-category" id="small-category" style="width: 200px;">
+                    <option value="">クリックして選択</option>
+                    @if ($small_category)
+                        @foreach ($big_small_categories as $category)
+                            <option value="{{ $small_categories[$category->small_category - 1]->id }}" @if ($small_categories[$category->small_category - 1]->id == $big_category) selected @endif>
+                                {{ $small_categories[$category->small_category - 1]->category }}
+                            </option>
+                        @endforeach
+                    @endif
+                </select>
+            </div>
+        </div>
+
+        <div class="row my-2">
             <div class="col-md-2">
                 <label>
                     商品名
@@ -87,4 +121,16 @@
             </div>
         @endif
     @endif
+
+    <script>
+        function loadSubCategories(bigCategoryId) {
+            $.post("{{ route('posts.new.load-sub-categories') }}", {
+                "_token": "{{ csrf_token() }}",
+                "big_category_id": bigCategoryId
+            }, function(data) {
+                // Update the second category dropdown with the returned data
+                $('#small-category').html(data);
+            });
+        }
+    </script>
 @endsection

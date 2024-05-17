@@ -22,7 +22,19 @@ use Carbon\Carbon;
 class PostsController extends Controller
 {
     public function index(){
-        $posts = Posts::orderBy('updated_at', 'desc')->with('images')->get();
+        $posts = Posts::orderBy('updated_at', 'desc')
+                        ->with('images', 'comments', 'likes')
+                        ->get()
+                        ->map(function ($post) {
+                            $wpbpactivity_data = WpBpActivity::where('user_id', $post['userId'])
+                                        ->where("component", 'members')
+                                        ->where("type", 'new_avatar')
+                                        ->where("action", "!=", '')
+                                        ->where("primary_link", "!=", '')
+                                        ->orderBy('date_recorded', 'desc')->first();
+                            $post->timestamp = strtotime($wpbpactivity_data['date_recorded']);
+                            return $post;
+                        })->toArray();
         return view('posts.index', compact('posts'));
     }
 
@@ -149,7 +161,12 @@ class PostsController extends Controller
             $result = WpUsers::where('user_email', Session::get('user_email'))->get();
             $userdata = $result[0];
 
-            $other_result = WpBpActivity::where('user_id', $result[0]['ID'])->where("action", "!=", '')->orderBy('date_recorded', 'desc')->first();
+            $other_result = WpBpActivity::where('user_id', $result[0]['ID'])
+                                        ->where("component", 'members')
+                                        ->where("type", 'new_avatar')
+                                        ->where("action", "!=", '')
+                                        ->where("primary_link", "!=", '')
+                                        ->orderBy('date_recorded', 'desc')->first();
             $timestamp = strtotime($other_result['date_recorded']);
 
             $big_categories = BigCategory::get();
@@ -199,6 +216,7 @@ class PostsController extends Controller
             $posts->storePurchase = $request->input('store-purchase');
             $posts->note = $request->input('note');
             $posts->userLogin =  $result[0]['user_login'];
+            $posts->userId =  $result[0]['ID'];
             $posts->categoryFirst =  $request->input('big-category');
             $posts->categorySecond =  $request->input('small-category');
             $posts->save();
@@ -285,7 +303,8 @@ class PostsController extends Controller
         $storePurchase = '';
         $note = '';
         $search_status = false;
-        return view('posts.search', compact('search_data', 'brandName', 'countryOrigin', 'maker', 'storePurchase', 'note', 'search_status'));
+        $big_categories = BigCategory::get();
+        return view('posts.search', compact('search_data', 'brandName', 'countryOrigin', 'maker', 'storePurchase', 'note', 'search_status', 'big_categories'));
     }
 
     public function search_result(Request $request){
@@ -294,9 +313,23 @@ class PostsController extends Controller
         $maker = $request->input('maker');
         $storePurchase = $request->input('store-purchase');
         $note = $request->input('note');
+        $big_category = $request->input('big-category');
+        $small_category = $request->input('small-category');
+
+        $big_categories = BigCategory::get();
+        $big_small_categories = BigSmallCategory::where('big_category', $big_category)->get();
+        $small_categories = SmallCategory::get();
 
         // Build the query to fetch the matching posts
         $posts = Posts::query();
+
+        if ($big_category) {
+            $posts->where('categoryFirst', $big_category);
+        }
+
+        if ($small_category) {
+            $posts->where('categorySecond', $small_category);
+        }
 
         if ($brandName) {
             $posts->where('brandName', 'like', '%' . $brandName . '%');
@@ -321,7 +354,7 @@ class PostsController extends Controller
         $search_data = $posts->get();
         $search_status = true;
         // Pass the search results to the view
-        return view('posts.search', compact('search_data', 'brandName', 'countryOrigin', 'maker', 'storePurchase', 'note', 'search_status'));
+        return view('posts.search', compact('search_data', 'brandName', 'countryOrigin', 'maker', 'storePurchase', 'note', 'search_status', 'big_categories', 'big_category', 'big_small_categories', 'small_categories', 'small_category'));
     }
 
     public function destroy($id){

@@ -10,4 +10,9 @@ class PostsLike extends Model
     use HasFactory;
 
     protected $table = 'posts_like';
+
+    public function post()
+    {
+        return $this->belongsTo(Posts::class, 'post_id');
+    }
 }

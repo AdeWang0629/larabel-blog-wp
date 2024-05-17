@@ -3,7 +3,7 @@
 @section('content')
     <div class="row">
         <div class="col-md-6" style="display: flex;align-items: center;">
-            <img src="{{ 'https://univer-goods.com/wp-content/uploads/avatars/'.$userdata['ID'].'/'.$timestamp.'-bpfull.png' }}" style="border-radius: 50%;">
+            <img src="{{ 'https://univer-goods.com/wp-content/uploads/avatars/'.$userdata['ID'].'/'.$timestamp.'-bpfull.jpg' }}" style="border-radius: 50%;">
             <a href="{{ 'https://univer-goods.com/member/'.$userdata['user_login'].'/profile/edit/group/1/' }}" style="align-self: flex-end;"><h4>{{$userdata['user_login']}}</h4></a>
         </div>
         <div class="col-md-6" style="color: red;">
