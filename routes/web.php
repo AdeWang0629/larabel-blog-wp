@@ -17,6 +17,7 @@ use App\Http\Controllers\AuthController;
 Route::get('/test', function(){
     dd('test');
 });
+
 // Route::get('/login/{email}/{password}', [PostsController::class, 'sso_login'])->name('sso_login');
 Route::get('/login/{email}', [PostsController::class, 'sso_login'])->name('sso_login');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -34,3 +35,7 @@ Route::delete('/new-delete/{postid}', [PostsController::class, 'destroy'])->name
 Route::post('/new-like/{postid}', [PostsController::class, 'like'])->name('posts.new.like');
 
 Route::post('/new-comment', [PostsController::class, 'comment'])->name('posts.new.comment');
+
+Route::get('/blog', [PostsController::class, 'index_blog'])->name('index.blog');
+
+Route::post('/posts/new/load-sub-categories', [PostsController::class, 'loadSubCategories'])->name('posts.new.load-sub-categories');

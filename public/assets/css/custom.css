@@ -25,11 +25,16 @@
     }
 }
 
+body {
+    background-image: url("/assets/img/download.jpg");
+}
+
 .container {
     background-color: white;
-    height: 770px;
     width: 70%;
     border-radius: 10px;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 @media only screen and (max-width: 600px) {
@@ -74,4 +79,14 @@
     font-size: 25px;
     padding-top: 30px;
     color: red;
+}
+
+.footer-container {
+    text-align: center;
+    background-color: white;
+}
+
+.footer-item {
+    color: black;
+    padding: 10px 10px;
 }

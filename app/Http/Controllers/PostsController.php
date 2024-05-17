@@ -11,8 +11,13 @@ use App\Models\WpUsers;
 use App\Models\WpBpActivity;
 use App\Models\PostsLike;
 use App\Models\PostsComment;
+use App\Models\BigCategory;
+use App\Models\SmallCategory;
+use App\Models\BigSmallCategory;
 
 use Illuminate\Support\Facades\Validator;
+
+use Carbon\Carbon;
 
 class PostsController extends Controller
 {
@@ -27,13 +32,30 @@ class PostsController extends Controller
             $post = $result[0];
 
             $second_result = WpUsers::where('user_email', Session::get('user_email'))->get();
-            $user_login = $second_result[0]['user_login'];
+            $user_nicename = $second_result[0]['user_nicename'];
 
             $modify_status = ($post['userNicename'] == $second_result[0]['user_nicename']);
             
             $like_result = PostsLike::where('user_email', Session::get('user_email'))->where('post_id', $post['id'])->get();
 
-            return view('posts.index_modify', compact('post', 'user_login', 'modify_status', 'like_result'));
+            $big_categories = BigCategory::get();
+            $big_small_categories = BigSmallCategory::where('big_category', $post['categoryFirst'])->get();
+            $small_categories = SmallCategory::get();
+
+            $submissionTime = Carbon::parse($post['updated_at']);
+            $currentTime = Carbon::now();
+
+            $timeDiff = $currentTime->diffInMinutes($submissionTime);
+
+            if ($timeDiff < 60) {
+                $displayTime = $timeDiff . '分前';
+            } elseif ($timeDiff < 1440) {
+                $displayTime = $currentTime->diffInHours($submissionTime) . '時間前';
+            } else {
+                $displayTime = $currentTime->diffInDays($submissionTime) . '日前';
+            }
+
+            return view('posts.index_modify', compact('post', 'user_nicename', 'modify_status', 'like_result', 'big_categories', 'big_small_categories', 'small_categories', 'displayTime'));
         }else {
             $posts = Posts::orderBy('updated_at', 'desc')->with('images')->get();
             return view('posts.index', compact('posts'));
@@ -50,128 +72,8 @@ class PostsController extends Controller
             $posts->storePurchase = $request->input('store-purchase');
             $posts->note = $request->input('note');
             $posts->userNicename =  $result[0]['user_nicename'];
-            $posts->save();
-
-            // if ($request->hasFile('upload-file1')) {
-            //     $file1 = $request->file('upload-file1');
-            //     $filename = 'first.' . time() . '.' . $file1->getClientOriginalExtension();
-            //     $file1->storeAs('public/uploads', $filename);
-            //     $filePath1 = 'storage/uploads/' . $filename;
-
-            //     $postImages = new PostImages;
-            //     $postImages->link = $filePath1;
-            //     $postImages->postId = $posts->id;
-            //     $postImages->save();
-            // } else if ($request->hasFile('upload-file2')) {
-            //     $file2 = $request->file('upload-file2');
-            //     $filename = time() . '.second.' . $file2->getClientOriginalExtension();
-            //     $file2->storeAs('public/uploads', $filename);
-            //     $filePath2 = 'storage/uploads/' . $filename;
-
-            //     $postImages = new PostImages;
-            //     $postImages->link = $filePath2;
-            //     $postImages->postId = $posts->id;
-            //     $postImages->save();
-            // } else if ($request->hasFile('upload-file3')) {
-            //     $file3 = $request->file('upload-file3');
-            //     $filename = time() . '.third.' . $file3->getClientOriginalExtension();
-            //     $file3->storeAs('public/uploads', $filename);
-            //     $filePath3 = 'storage/uploads/' . $filename;
-
-            //     $postImages = new PostImages;
-            //     $postImages->link = $filePath3;
-            //     $postImages->postId = $posts->id;
-            //     $postImages->save();
-            // } else if ($request->hasFile('upload-file4')) {
-            //     $file4 = $request->file('upload-file4');
-            //     $filename = time() . '.fourth.' . $file4->getClientOriginalExtension();
-            //     $file4->storeAs('public/uploads', $filename);
-            //     $filePath4 = 'storage/uploads/' . $filename;
-
-            //     $postImages = new PostImages;
-            //     $postImages->link = $filePath4;
-            //     $postImages->postId = $posts->id;
-            //     $postImages->save();
-            // } else if ($request->hasFile('upload-file5')) {
-            //     $file5 = $request->file('upload-file5');
-            //     $filename = time() . '.fifth.' . $file5->getClientOriginalExtension();
-            //     $file5->storeAs('public/uploads', $filename);
-            //     $filePath5 = 'storage/uploads/' . $filename;
-
-            //     $postImages = new PostImages;
-            //     $postImages->link = $filePath5;
-            //     $postImages->postId = $posts->id;
-            //     $postImages->save();
-            // } else if ($request->hasFile('upload-file6')) {
-            //     $file6 = $request->file('upload-file6');
-            //     $filename = time() . '.sixth.' . $file6->getClientOriginalExtension();
-            //     $file6->storeAs('public/uploads', $filename);
-            //     $filePath6 = 'storage/uploads/' . $filename;
-
-            //     $postImages = new PostImages;
-            //     $postImages->link = $filePath6;
-            //     $postImages->postId = $posts->id;
-            //     $postImages->save();
-            // }
-            
-            return redirect()->route('posts.index');
-        }else {
-            $posts = Posts::orderBy('updated_at', 'desc')->with('images')->get();
-            return view('posts.index', compact('posts'));
-        }
-    }
-
-    public function create(){
-        if (Session::has('user_email')) {
-            $result = WpUsers::where('user_email', Session::get('user_email'))->get();
-            $userdata = $result[0];
-            $other_result = WpBpActivity::where('user_id', $result[0]['ID'])->orderBy('date_recorded', 'desc')->first();
-            $timestamp = strtotime($other_result['date_recorded']);
-            return view('posts.create', compact('userdata', 'timestamp'));
-        }else {
-            $posts = Posts::orderBy('updated_at', 'desc')->with('images')->get();
-            return view('posts.index', compact('posts'));
-        }
-    }
-
-    public function sso_login(Request $request){
-        $email = $request['email'];
-        // $password = $request['password'];
-        return view('welcome', compact('email'));
-    }
-
-    public function new_create(Request $request){
-        if (Session::has('user_email')) {
-            $validator = Validator::make($request->all(), [
-                'upload-file1' => 'image|max:2048',
-                'upload-file2' => 'image|max:2048',
-                'upload-file3' => 'image|max:2048',
-                'upload-file4' => 'image|max:2048',
-                'upload-file5' => 'image|max:2048',
-                'upload-file6' => 'image|max:2048',
-                'category-first' => 'required',
-                'category-second' => 'required',
-                'brand-name' => 'required|max:255',
-                'country-origin' => 'required|max:255',
-                'maker' => 'required|max:255',
-                'store-purchase' => 'required|max:255',
-                'note' => 'required',
-            ],[
-                'required' => 'この項目入力は必須です。',
-            ]);
-            
-            if ($validator->fails()) {
-                return redirect()->back()->withErrors($validator)->withInput();
-            }
-            
-            $result = WpUsers::where('user_email', Session::get('user_email'))->get();
-            $posts = new Posts;
-            $posts->brandName = $request->input('brand-name');
-            $posts->countryOrigin = $request->input('country-origin');
-            $posts->maker = $request->input('maker');
-            $posts->storePurchase = $request->input('store-purchase');
-            $posts->note = $request->input('note');
-            $posts->userNicename =  $result[0]['user_nicename'];
+            $posts->categoryFirst =  $request->input('big-category');
+            $posts->categorySecond =  $request->input('small-category');
             $posts->save();
 
             if ($request->hasFile('upload-file1')) {
@@ -236,6 +138,139 @@ class PostsController extends Controller
                 $postImages->save();
             }
             
+            return redirect()->route('posts.index');
+        }else {
+            $posts = Posts::orderBy('updated_at', 'desc')->with('images')->get();
+            return view('posts.index', compact('posts'));
+        }
+    }
+
+    public function create(){
+        if (Session::has('user_email')) {
+            $result = WpUsers::where('user_email', Session::get('user_email'))->get();
+            $userdata = $result[0];
+
+            $other_result = WpBpActivity::where('user_id', $result[0]['ID'])->where("action", "!=", '')->orderBy('date_recorded', 'desc')->first();
+            $timestamp = strtotime($other_result['date_recorded']);
+
+            $big_categories = BigCategory::get();
+
+            return view('posts.create', compact('userdata', 'timestamp', 'big_categories'));
+        }else {
+            $posts = Posts::orderBy('updated_at', 'desc')->with('images')->get();
+            return view('posts.index', compact('posts'));
+        }
+    }
+
+    public function sso_login(Request $request){
+        $email = $request['email'];
+        // $password = $request['password'];
+        return view('welcome', compact('email'));
+    }
+
+    public function new_create(Request $request){
+        if (Session::has('user_email')) {
+            $validator = Validator::make($request->all(), [
+                'upload-file1' => 'image|max:2048',
+                'upload-file2' => 'image|max:2048',
+                'upload-file3' => 'image|max:2048',
+                'upload-file4' => 'image|max:2048',
+                'upload-file5' => 'image|max:2048',
+                'upload-file6' => 'image|max:2048',
+                'big-category' => 'required',
+                'small-category' => 'required',
+                'brand-name' => 'required|max:255',
+                'country-origin' => 'required|max:255',
+                'maker' => 'required|max:255',
+                'store-purchase' => 'required|max:255',
+                'note' => 'required',
+            ],[
+                'required' => 'この項目入力は必須です。',
+            ]);
+            
+            if ($validator->fails()) {
+                return redirect()->back()->withErrors($validator)->withInput();
+            }
+
+            $result = WpUsers::where('user_email', Session::get('user_email'))->get();
+            $posts = new Posts;
+            $posts->brandName = $request->input('brand-name');
+            $posts->countryOrigin = $request->input('country-origin');
+            $posts->maker = $request->input('maker');
+            $posts->storePurchase = $request->input('store-purchase');
+            $posts->note = $request->input('note');
+            $posts->userNicename =  $result[0]['user_nicename'];
+            $posts->categoryFirst =  $request->input('big-category');
+            $posts->categorySecond =  $request->input('small-category');
+            $posts->save();
+
+            if ($request->hasFile('upload-file1')) {
+                $file1 = $request->file('upload-file1');
+                $filename = 'first.' . time() . '.' . $file1->getClientOriginalExtension();
+                $file1->storeAs('public/uploads', $filename);
+                $filePath1 = 'storage/uploads/' . $filename;
+
+                $postImages = new PostImages;
+                $postImages->link = $filePath1;
+                $postImages->postId = $posts->id;
+                $postImages->save();
+            } 
+            if ($request->hasFile('upload-file2')) {
+                $file2 = $request->file('upload-file2');
+                $filename = time() . '.second.' . $file2->getClientOriginalExtension();
+                $file2->storeAs('public/uploads', $filename);
+                $filePath2 = 'storage/uploads/' . $filename;
+
+                $postImages = new PostImages;
+                $postImages->link = $filePath2;
+                $postImages->postId = $posts->id;
+                $postImages->save();
+            } 
+            if ($request->hasFile('upload-file3')) {
+                $file3 = $request->file('upload-file3');
+                $filename = time() . '.third.' . $file3->getClientOriginalExtension();
+                $file3->storeAs('public/uploads', $filename);
+                $filePath3 = 'storage/uploads/' . $filename;
+
+                $postImages = new PostImages;
+                $postImages->link = $filePath3;
+                $postImages->postId = $posts->id;
+                $postImages->save();
+            } 
+            if ($request->hasFile('upload-file4')) {
+                $file4 = $request->file('upload-file4');
+                $filename = time() . '.fourth.' . $file4->getClientOriginalExtension();
+                $file4->storeAs('public/uploads', $filename);
+                $filePath4 = 'storage/uploads/' . $filename;
+
+                $postImages = new PostImages;
+                $postImages->link = $filePath4;
+                $postImages->postId = $posts->id;
+                $postImages->save();
+            } 
+            if ($request->hasFile('upload-file5')) {
+                $file5 = $request->file('upload-file5');
+                $filename = time() . '.fifth.' . $file5->getClientOriginalExtension();
+                $file5->storeAs('public/uploads', $filename);
+                $filePath5 = 'storage/uploads/' . $filename;
+
+                $postImages = new PostImages;
+                $postImages->link = $filePath5;
+                $postImages->postId = $posts->id;
+                $postImages->save();
+            } 
+            if ($request->hasFile('upload-file6')) {
+                $file6 = $request->file('upload-file6');
+                $filename = time() . '.sixth.' . $file6->getClientOriginalExtension();
+                $file6->storeAs('public/uploads', $filename);
+                $filePath6 = 'storage/uploads/' . $filename;
+
+                $postImages = new PostImages;
+                $postImages->link = $filePath6;
+                $postImages->postId = $posts->id;
+                $postImages->save();
+            }
+            
             return redirect()->route('posts.create');
         }else {
             $posts = Posts::orderBy('updated_at', 'desc')->with('images')->get();
@@ -250,7 +285,8 @@ class PostsController extends Controller
         $maker = '';
         $storePurchase = '';
         $note = '';
-        return view('posts.search', compact('search_data', 'brandName', 'countryOrigin', 'maker', 'storePurchase', 'note'));
+        $search_status = false;
+        return view('posts.search', compact('search_data', 'brandName', 'countryOrigin', 'maker', 'storePurchase', 'note', 'search_status'));
     }
 
     public function search_result(Request $request){
@@ -262,14 +298,6 @@ class PostsController extends Controller
 
         // Build the query to fetch the matching posts
         $posts = Posts::query();
-
-        // if ($categoryFirst) {
-        //     $posts->where('category_first', $categoryFirst);
-        // }
-
-        // if ($categorySecond) {
-        //     $posts->where('category_second', $categorySecond);
-        // }
 
         if ($brandName) {
             $posts->where('brandName', 'like', '%' . $brandName . '%');
@@ -292,9 +320,9 @@ class PostsController extends Controller
         }
 
         $search_data = $posts->get();
-
+        $search_status = true;
         // Pass the search results to the view
-        return view('posts.search', compact('search_data', 'brandName', 'countryOrigin', 'maker', 'storePurchase', 'note'));
+        return view('posts.search', compact('search_data', 'brandName', 'countryOrigin', 'maker', 'storePurchase', 'note', 'search_status'));
     }
 
     public function destroy($id){
@@ -319,7 +347,7 @@ class PostsController extends Controller
         }
     }
 
-    public function comment(Request $request){
+    public function comment(Request $request) {
         $posts_comment = new PostsComment;
         $posts_comment->post_id = $request->input('comment_post_id');
         $posts_comment->comment = $request->input('comment_note');
@@ -337,4 +365,22 @@ class PostsController extends Controller
 
         return view('posts.index_modify', compact('post', 'user_login', 'modify_status', 'like_result'));
     }   
+
+    public function index_blog() {
+        return view('blogs.index');
+    }
+
+    public function loadSubCategories(Request $request)
+    {
+        $bigCategoryId = $request->input('big_category_id');
+        $subCategories = BigSmallCategory::where('big_category', $bigCategoryId)->get();
+        $smallCategories = SmallCategory::get();
+
+        $html = '<option value="">クリックして選択</option>';
+        foreach ($subCategories as $category) {
+            $html .= '<option value="' . $smallCategories[$category->id - 1]->id . '">' . $smallCategories[$category->id - 1]->category . '</option>';
+        }
+
+        return $html;
+    }
 }

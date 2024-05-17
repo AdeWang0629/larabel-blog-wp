@@ -3,7 +3,9 @@
 @section('content')
     <div class="row">
         <div class="col-md-6" style="display: flex;align-items: center;">
-            <h3>{{$user_login}}</h3>
+            <a href="{{ 'https://univer-goods.com/member/'.$user_nicename.'/profile/edit/group/1/' }}" style="align-self: flex-end;"><h3>{{$user_nicename}}</h3></a>
+
+            <span style="padding-left: 10px;">{{$displayTime}}</span>
         </div>
     </div>
     <form method="POST" action="{{route('posts.new.modify')}}" enctype="multipart/form-data">
@@ -33,11 +35,13 @@
                 <label>
                     商品カテゴリ1
                 </label>
-                <select name="category-first" id="category-first" style="width: 200px;">
-                    <option value="volvo">Volvo</option>
-                    <option value="saab">Saab</option>
-                    <option value="mercedes">Mercedes</option>
-                    <option value="audi">Audi</option>
+                <select name="big-category" id="big-category" style="width: 200px;" onchange="loadSubCategories(this.value)">
+                    <option value="">クリックして選択</option>
+                    @foreach ($big_categories as $category)
+                        <option value="{{ $category->id }}" @if ($category->id == $post['categoryFirst']) selected @endif>
+                            {{ $category->category }}
+                        </option>
+                    @endforeach
                 </select>
             </div>
 
@@ -45,11 +49,13 @@
                 <label>
                     商品カテゴリ2
                 </label>
-                <select name="category-second" id="category-second" style="width: 200px;">
-                    <option value="volvo">Volvo</option>
-                    <option value="saab">Saab</option>
-                    <option value="mercedes">Mercedes</option>
-                    <option value="audi">Audi</option>
+                <select name="small-category" id="small-category" style="width: 200px;">
+                    <option value="">クリックして選択</option>
+                    @foreach ($big_small_categories as $category)
+                        <option value="{{ $small_categories[$category->small_category - 1]->id }}" @if ($small_categories[$category->small_category - 1]->id == $post['categoryFirst']) selected @endif>
+                            {{ $small_categories[$category->small_category - 1]->category }}
+                        </option>
+                    @endforeach
                 </select>
             </div>
         </div>
@@ -131,7 +137,7 @@
             <form method="POST" action="{{ route('posts.new.delete', $post['id']) }}">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="btn btn-danger">消滅</button>
+                <button type="submit" class="btn btn-danger">削除</button>
             </form>
 
         </div>
@@ -172,5 +178,15 @@
                 commentInput.value = '';
             }
         });
+
+        function loadSubCategories(bigCategoryId) {
+            $.post("{{ route('posts.new.load-sub-categories') }}", {
+                "_token": "{{ csrf_token() }}",
+                "big_category_id": bigCategoryId
+            }, function(data) {
+                // Update the second category dropdown with the returned data
+                $('#small-category').html(data);
+            });
+        }
     </script>
 @endsection

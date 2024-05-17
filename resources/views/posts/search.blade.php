@@ -3,31 +3,6 @@
 @section('content')
     <form method="POST" action="{{route('posts.search.result')}}">
         @csrf
-        <div class="row my-2">
-            <div class="col-md-6 my-2">
-                <label>
-                    商品カテゴリ1
-                </label>
-                <select name="category-first" id="category-first" style="width: 200px;">
-                    <option value="volvo">Volvo</option>
-                    <option value="saab">Saab</option>
-                    <option value="mercedes">Mercedes</option>
-                    <option value="audi">Audi</option>
-                </select>
-            </div>
-
-            <div class="col-md-6 my-2">
-                <label>
-                    商品カテゴリ2
-                </label>
-                <select name="category-second" id="category-second" style="width: 200px;">
-                    <option value="volvo">Volvo</option>
-                    <option value="saab">Saab</option>
-                    <option value="mercedes">Mercedes</option>
-                    <option value="audi">Audi</option>
-                </select>
-            </div>
-        </div>
 
         <div class="row my-2">
             <div class="col-md-2">
@@ -87,27 +62,29 @@
         </div>
     </form>
 
-    <div style="text-align: center">
-        <h1>検索結果</h1>
-    </div>
-    @if (count($search_data))
-        <div class="row">
-            @foreach ($search_data as $post)
-                <div class="col-md-4">
-                    <a href="{{ url('/modify-posts/' . $post->id) }}">
-                        @if (count($post->images))
-                            <img src="{{ asset($post->images[0]->link) }}" alt="{{ $post->title }}" style="width: 100%; height: 300px;"/>
-                        @else
-                            <img src="{{ asset('assets/img/no-image--recent-activity2.svg') }}" alt="{{ $post->title }}" style="width: 100%;height: height: 300px;"/>
-                        @endif
-                    </a>
-                    <p class="my-2">投稿者: {{$post->userEmail}}</p>
-                </div>
-            @endforeach
+    @if ($search_status)
+        <div style="text-align: center">
+            <h1>検索結果</h1>
         </div>
-    @else
-        <div class="no-container">
-            <span>検索内容がありません。</span>
-        </div>
+        @if (count($search_data))
+            <div class="row">
+                @foreach ($search_data as $post)
+                    <div class="col-md-4">
+                        <a href="{{ url('/modify-posts/' . $post->id) }}">
+                            @if (count($post->images))
+                                <img src="{{ asset($post->images[0]->link) }}" alt="{{ $post->title }}" style="width: 100%; height: 300px;"/>
+                            @else
+                                <img src="{{ asset('assets/img/no-image--recent-activity2.svg') }}" alt="{{ $post->title }}" style="width: 100%;height: height: 300px;"/>
+                            @endif
+                        </a>
+                        <p class="my-2">投稿者: <a href="{{ 'https://univer-goods.com/member/'.$post->userNicename.'/profile/edit/group/1/' }}" style="align-self: flex-end;">{{$post->userNicename}}</a></p>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <div class="no-container">
+                <span>検索内容がありません。</span>
+            </div>
+        @endif
     @endif
 @endsection

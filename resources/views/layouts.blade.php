@@ -32,29 +32,43 @@
                     </li>
                @endif
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('posts.search') }}" style="margin: 15px 30px;">検索</a>
+                    <a class="nav-link {{ request()->routeIs('posts.search')  ? 'active' : ''}}" href="{{ route('posts.search') }}" style="margin: 15px 30px;">検索</a>
                 </li>
                 @if (session()->has('user_email'))
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('posts.blog')  ? 'active' : ''}}" href="#" style="margin: 15px 30px;">ブログ</a>
+                        <a class="nav-link {{ request()->routeIs('index.blog')  ? 'active' : ''}}" href="{{ route('index.blog') }}" style="margin: 15px 30px;">ブログ</a>
                     </li>
                 @endif
             </ul>
         </div>
-        <div class="header-container">
-            <div class="container">
-                @yield('content')
-            </div>
-        </div>
+        
+        {{-- <div class="header-container">
+        </div> --}}
     </header>
 
     <body>
-        {{-- <div class="footer-container d-flex justify-content-center">
-            © Univerclothes All Rights Reserved.
-        </div> --}}
+        <div class="container">
+            @yield('content')
+        </div>
+
+        <div class="footer-container">
+            
+            <div>
+                <a href="https://univer-goods.com/terms/" class="footer-item">利用規約</a>
+                <a href="https://univer-goods.com/privacy-policy/" class="footer-item">プライバシーポリシー</a>
+                <a href="https://univer-goods.com/inquiry/" class="footer-item">お問い合わせ</a>
+                <a href="https://univer-goods.com/sitemap/" class="footer-item">コンテンツ一覧</a>
+                <a href="https://univer-goods.com/" class="footer-item">TOPページ</a>
+            </div>
+
+            <div class="pt-3">
+                © Univerclothes All Rights Reserved.
+            </div>
+
+        </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-        <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="{{ asset('assets/js/custom.js') }}"></script>
     </body>
 </html>

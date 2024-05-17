@@ -1,10 +1,9 @@
 
 function previewFile(id) {
-    console.log(id);
     const fileInput = document.getElementById('upload-file'+id);
     const fileIcon = document.getElementById('file-icon'+id);
     const selectedFile = document.getElementById('selected-file'+id);
-
+    console.log(fileInput);
     if (fileInput.files && fileInput.files[0]) {
         const reader = new FileReader();
         reader.onload = function(e) {
