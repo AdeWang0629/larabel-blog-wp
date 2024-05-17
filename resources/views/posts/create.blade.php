@@ -4,7 +4,7 @@
     <div class="row">
         <div class="col-md-6" style="display: flex;align-items: center;">
             <img src="{{ 'https://univer-goods.com/wp-content/uploads/avatars/'.$userdata['ID'].'/'.$timestamp.'-bpfull.png' }}" style="border-radius: 50%;">
-            <a href="{{ 'https://univer-goods.com/member/'.$userdata['user_nicename'].'/profile/edit/group/1/' }}" style="align-self: flex-end;"><h4>{{$userdata['user_login']}}</h4></a>
+            <a href="{{ 'https://univer-goods.com/member/'.$userdata['user_login'].'/profile/edit/group/1/' }}" style="align-self: flex-end;"><h4>{{$userdata['user_login']}}</h4></a>
         </div>
         <div class="col-md-6" style="color: red;">
             <p>
@@ -26,9 +26,9 @@
                 <div class="col-sm-2 col-4 my-2">
                     <label id="upload-label" for="upload-file{{$i}}">
                         <span id="file-icon{{$i}}">画像</span>
-                        <img id="selected-file{{$i}}" src="#" alt="Selected File" style="display: none;" class="upload-img">
+                        <img id="selected-file{{$i}}" src="#" alt="Selected File" style="display: none;object-fit: cover;" class="upload-img">
                     </label>
-                    <input type="file" id="upload-file{{$i}}" name="upload-file{{$i}}" style="display: none;" onchange="previewFile({{$i}})">
+                    <input type="file" id="upload-file{{$i}}" name="upload-file{{$i}}" style="display: none;object-fit: cover;" onchange="previewFile({{$i}})">
                     <span class="text-danger">{{ $errors->first('upload-file'.$i) }}</span>
                 </div>
             @endfor

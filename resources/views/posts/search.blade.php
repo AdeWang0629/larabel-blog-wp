@@ -77,7 +77,7 @@
                                 <img src="{{ asset('assets/img/no-image--recent-activity2.svg') }}" alt="{{ $post->title }}" style="width: 100%;height: height: 300px;"/>
                             @endif
                         </a>
-                        <p class="my-2">投稿者: <a href="{{ 'https://univer-goods.com/member/'.$post->userNicename.'/profile/edit/group/1/' }}" style="align-self: flex-end;">{{$post->userNicename}}</a></p>
+                        <p class="my-2">投稿者: <a href="{{ 'https://univer-goods.com/member/'.$post->userLogin.'/profile/edit/group/1/' }}" style="align-self: flex-end;">{{$post->userLogin}}</a></p>
                     </div>
                 @endforeach
             </div>

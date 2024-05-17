@@ -32,9 +32,10 @@ Route::get('/posts/search', [PostsController::class, 'search'])->name('posts.sea
 Route::post('/posts/search/result', [PostsController::class, 'search_result'])->name('posts.search.result');
 
 Route::delete('/new-delete/{postid}', [PostsController::class, 'destroy'])->name('posts.new.delete');
-Route::post('/new-like/{postid}', [PostsController::class, 'like'])->name('posts.new.like');
+Route::post('/new-like', [PostsController::class, 'like'])->name('posts.new.like');
 
 Route::post('/new-comment', [PostsController::class, 'comment'])->name('posts.new.comment');
+Route::delete('/comment-delete/{commentid}', [PostsController::class, 'comment_destroy'])->name('posts.comment.delete');
 
 Route::get('/blog', [PostsController::class, 'index_blog'])->name('index.blog');
 

@@ -3,7 +3,7 @@
 @section('content')
     <div class="row">
         <div class="col-md-6" style="display: flex;align-items: center;">
-            <a href="{{ 'https://univer-goods.com/member/'.$user_nicename.'/profile/edit/group/1/' }}" style="align-self: flex-end;"><h3>{{$user_nicename}}</h3></a>
+            <a href="{{ 'https://univer-goods.com/member/'.$post->userLogin.'/profile/edit/group/1/' }}" style="align-self: flex-end;"><h3>{{$post->userLogin}}</h3></a>
 
             <span style="padding-left: 10px;">{{$displayTime}}</span>
         </div>
@@ -116,34 +116,53 @@
         </div>
     </form>
 
+    <div class="btn-group">
+
+        <button type="button" class="btn btn-primary" id="comment-button">
+            コメント
+            <i class="fa fa-comment" style="font-size:16px;"></i>
+        </button>
+
+        <button type="button" class="btn btn-success" onclick="like_function({{$post['id']}})">
+            いいね！
+            <span id="like_icon">
+                @if ($like_result)
+                    <i class="fa fa-star" style="font-size:16px;"></i>
+                @else
+                    <i class="fa fa-star-o" style="font-size:16px;"></i>
+                @endif
+            </span>
+        </button>
+
+        <form method="POST" action="{{ route('posts.new.delete', $post['id']) }}" id="posts-new-delete">
+            @csrf
+            @method('DELETE')
+            <button type="button" class="btn btn-danger" @if(!$modify_status) disabled @endif onclick="delete_function()">
+                削除
+                <i class="fa fa-trash" style="font-size:16px;"></i>
+            </button>
+        </form>
+
+    </div>
+
     @if (count($post['comments']))
         @foreach ($post['comments'] as $comment)
             <div>
                 <p>{{ $comment->comment }}</p>
+
+                @if ($modify_status)
+                    <form method="POST" action="{{ route('posts.comment.delete', $comment->id) }}" id="posts-comment-delete">
+                        @csrf
+                        @method('DELETE')
+                        <button type="button" @if(!$modify_status) disabled @endif onclick="delete_comment_function()">
+                            削除
+                        </button>
+                    </form>
+                @endif
             </div>
         @endforeach
     @endif
 
-    <div class="d-flex justify-content-center">
-        <div class="btn-group">
-
-            <button type="button" class="btn btn-primary" id="comment-button">コメント</button>
-
-            <form method="POST" action="{{ route('posts.new.like', $post['id']) }}">
-                @csrf
-                <button type="submit" class="btn btn-success" @if(!count($like_result)) disabled @endif>いいね！</button>
-            </form>
-
-            <form method="POST" action="{{ route('posts.new.delete', $post['id']) }}">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn btn-danger">削除</button>
-            </form>
-
-        </div>
-    </div>
-
-    
     <div id="comment-form" style="display: none; margin-top: 10px;">
         <form method="POST" action="{{ route('posts.new.comment') }}">
             @csrf
@@ -187,6 +206,34 @@
                 // Update the second category dropdown with the returned data
                 $('#small-category').html(data);
             });
+        }
+
+        function like_function(post_id) {
+            $.post("{{ route('posts.new.like') }}", {
+                "_token": "{{ csrf_token() }}",
+                "post_id": post_id
+            }, function(data) {
+                // Update the second category dropdown with the returned data
+                if (data) {
+                    $('#like_icon').html("<i class='fa fa-star' style='font-size:16px;'></i>");
+                } else {
+                    $('#like_icon').html("<i class='fa fa-star-o' style='font-size:16px;'></i>");
+                }
+            });
+        }
+
+        function delete_function() {
+            if (confirm("本当に削除しますか？")) {
+                // User clicked "OK"
+                document.querySelector('#posts-new-delete').submit();
+            }
+        }
+
+        function delete_comment_function() {
+            if (confirm("本当に削除しますか？")) {
+                // User clicked "OK"
+                document.querySelector('#posts-comment-delete').submit();
+            }
         }
     </script>
 @endsection

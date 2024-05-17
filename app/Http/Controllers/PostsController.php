@@ -32,11 +32,10 @@ class PostsController extends Controller
             $post = $result[0];
 
             $second_result = WpUsers::where('user_email', Session::get('user_email'))->get();
-            $user_nicename = $second_result[0]['user_nicename'];
 
-            $modify_status = ($post['userNicename'] == $second_result[0]['user_nicename']);
-            
-            $like_result = PostsLike::where('user_email', Session::get('user_email'))->where('post_id', $post['id'])->get();
+            $modify_status = ($post['userLogin'] == $second_result[0]['user_login']); 
+
+            $like_result = PostsLike::where('user_email', Session::get('user_email'))->where('post_id', $post['id'])->first();
 
             $big_categories = BigCategory::get();
             $big_small_categories = BigSmallCategory::where('big_category', $post['categoryFirst'])->get();
@@ -55,7 +54,7 @@ class PostsController extends Controller
                 $displayTime = $currentTime->diffInDays($submissionTime) . '日前';
             }
 
-            return view('posts.index_modify', compact('post', 'user_nicename', 'modify_status', 'like_result', 'big_categories', 'big_small_categories', 'small_categories', 'displayTime'));
+            return view('posts.index_modify', compact('post', 'modify_status', 'like_result', 'big_categories', 'big_small_categories', 'small_categories', 'displayTime'));
         }else {
             $posts = Posts::orderBy('updated_at', 'desc')->with('images')->get();
             return view('posts.index', compact('posts'));
@@ -71,7 +70,7 @@ class PostsController extends Controller
             $posts->maker = $request->input('maker');
             $posts->storePurchase = $request->input('store-purchase');
             $posts->note = $request->input('note');
-            $posts->userNicename =  $result[0]['user_nicename'];
+            $posts->userLogin =  $result[0]['user_login'];
             $posts->categoryFirst =  $request->input('big-category');
             $posts->categorySecond =  $request->input('small-category');
             $posts->save();
@@ -199,7 +198,7 @@ class PostsController extends Controller
             $posts->maker = $request->input('maker');
             $posts->storePurchase = $request->input('store-purchase');
             $posts->note = $request->input('note');
-            $posts->userNicename =  $result[0]['user_nicename'];
+            $posts->userLogin =  $result[0]['user_login'];
             $posts->categoryFirst =  $request->input('big-category');
             $posts->categorySecond =  $request->input('small-category');
             $posts->save();
@@ -332,15 +331,55 @@ class PostsController extends Controller
         return view('posts.index', compact('posts'));
     }
 
-    public function like($id){
-        if (Session::has('user_email')) {
-            $posts_like = new PostsLike;
-            $posts_like->user_email = Session::get('user_email');
-            $posts_like->post_id = $id;
-            $posts_like->save();
+    public function comment_destroy($comment_id){
+        $comment_data = PostsComment::where('id', $comment_id)->first();
+        $post_id = $comment_data['post_id'];
+        $comment_data->delete();
 
-            $posts = Posts::orderBy('updated_at', 'desc')->with('images')->get();
-            return view('posts.index', compact('posts'));
+        $result = Posts::where('id', $post_id)->with('images')->with('comments')->get();
+        $post = $result[0];
+
+        $second_result = WpUsers::where('user_email', Session::get('user_email'))->get();
+
+        $modify_status = ($post['userLogin'] == $second_result[0]['user_login']); 
+
+        $like_result = PostsLike::where('user_email', Session::get('user_email'))->where('post_id', $post['id'])->first();
+
+        $big_categories = BigCategory::get();
+        $big_small_categories = BigSmallCategory::where('big_category', $post['categoryFirst'])->get();
+        $small_categories = SmallCategory::get();
+
+        $submissionTime = Carbon::parse($post['updated_at']);
+        $currentTime = Carbon::now();
+
+        $timeDiff = $currentTime->diffInMinutes($submissionTime);
+
+        if ($timeDiff < 60) {
+            $displayTime = $timeDiff . '分前';
+        } elseif ($timeDiff < 1440) {
+            $displayTime = $currentTime->diffInHours($submissionTime) . '時間前';
+        } else {
+            $displayTime = $currentTime->diffInDays($submissionTime) . '日前';
+        }
+
+        return view('posts.index_modify', compact('post', 'modify_status', 'like_result', 'big_categories', 'big_small_categories', 'small_categories', 'displayTime'));
+    }
+
+    public function like(Request $request){
+        if (Session::has('user_email')) {
+ 
+            $posts_like_data = PostsLike::where('user_email', Session::get('user_email'))->where('post_id', $request->post_id)->first();
+
+            if ($posts_like_data) {
+                $posts_like_data->delete();
+                return false;
+            } else {
+                $posts_like = new PostsLike;
+                $posts_like->user_email = Session::get('user_email');
+                $posts_like->post_id = $request->post_id;
+                $posts_like->save();
+                return true;
+            }
         }else {
             $posts = Posts::orderBy('updated_at', 'desc')->with('images')->get();
             return view('posts.index', compact('posts'));
@@ -353,17 +392,33 @@ class PostsController extends Controller
         $posts_comment->comment = $request->input('comment_note');
         $posts_comment->save();
   
-        $result = Posts::where('id', $request['comment_post_id'])->with('images')->with('comments')->get();
+        $result = Posts::where('id', $request->input('comment_post_id'))->with('images')->with('comments')->get();
         $post = $result[0];
-       
+
         $second_result = WpUsers::where('user_email', Session::get('user_email'))->get();
-        $user_login = $second_result[0]['user_login'];
 
-        $modify_status = ($post['userNicename'] == $second_result[0]['user_nicename']);
-        
-        $like_result = PostsLike::where('user_email', Session::get('user_email'))->where('post_id', $post['id'])->get();
+        $modify_status = ($post['userLogin'] == $second_result[0]['user_login']); 
 
-        return view('posts.index_modify', compact('post', 'user_login', 'modify_status', 'like_result'));
+        $like_result = PostsLike::where('user_email', Session::get('user_email'))->where('post_id', $request->input('comment_post_id'))->first();
+
+        $big_categories = BigCategory::get();
+        $big_small_categories = BigSmallCategory::where('big_category', $post['categoryFirst'])->get();
+        $small_categories = SmallCategory::get();
+
+        $submissionTime = Carbon::parse($post['updated_at']);
+        $currentTime = Carbon::now();
+
+        $timeDiff = $currentTime->diffInMinutes($submissionTime);
+
+        if ($timeDiff < 60) {
+            $displayTime = $timeDiff . '分前';
+        } elseif ($timeDiff < 1440) {
+            $displayTime = $currentTime->diffInHours($submissionTime) . '時間前';
+        } else {
+            $displayTime = $currentTime->diffInDays($submissionTime) . '日前';
+        }
+
+        return view('posts.index_modify', compact('post', 'modify_status', 'like_result', 'big_categories', 'big_small_categories', 'small_categories', 'displayTime'));
     }   
 
     public function index_blog() {
