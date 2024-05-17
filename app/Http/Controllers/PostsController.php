@@ -304,7 +304,9 @@ class PostsController extends Controller
         $note = '';
         $search_status = false;
         $big_categories = BigCategory::get();
-        return view('posts.search', compact('search_data', 'brandName', 'countryOrigin', 'maker', 'storePurchase', 'note', 'search_status', 'big_categories'));
+        $big_category = '';
+        $small_category = '';
+        return view('posts.search', compact('search_data', 'brandName', 'countryOrigin', 'maker', 'storePurchase', 'note', 'search_status', 'big_categories', 'big_category', 'small_category'));
     }
 
     public function search_result(Request $request){
@@ -351,7 +353,18 @@ class PostsController extends Controller
             $posts->where('note', 'like', '%' . $note . '%');
         }
 
-        $search_data = $posts->get();
+        $search_data = $posts ->with('images', 'comments', 'likes')
+                            ->get()
+                            ->map(function ($post) {
+                                $wpbpactivity_data = WpBpActivity::where('user_id', $post['userId'])
+                                            ->where("component", 'members')
+                                            ->where("type", 'new_avatar')
+                                            ->where("action", "!=", '')
+                                            ->where("primary_link", "!=", '')
+                                            ->orderBy('date_recorded', 'desc')->first();
+                                $post->timestamp = strtotime($wpbpactivity_data['date_recorded']);
+                                return $post;
+                            })->toArray();
         $search_status = true;
         // Pass the search results to the view
         return view('posts.search', compact('search_data', 'brandName', 'countryOrigin', 'maker', 'storePurchase', 'note', 'search_status', 'big_categories', 'big_category', 'big_small_categories', 'small_categories', 'small_category'));
